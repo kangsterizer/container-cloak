@@ -82,7 +82,6 @@ async function cloak(tab) {
   for (let ctab of tabs) {
     if (tab.cookieStoreId == ctab.cookieStoreId) {
       let state = await browser.sessions.getTabValue(ctab.id, "cloaked");
-      console.log(state);
       if (state) {
         console.log("Will restore cloak tab: "+ctab.id);
         restoreCloak(ctab);
