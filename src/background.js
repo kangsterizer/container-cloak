@@ -50,7 +50,7 @@ async function actuallyCloak(tab) {
   `;
 
   await browser.tabs.executeScript(tab.id, {
-    code: blackPageOut
+    code: blackPageOut,
   });
 
   // Fav icon
@@ -67,7 +67,6 @@ async function actuallyCloak(tab) {
         l.href = "`+faviconURL+`";
       });
     `});
-  console.log(tab);
 
   window.cloaked_tabs.push(tab.id);
   console.log("tab "+tab.id+" is now cloaked");
