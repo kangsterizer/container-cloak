@@ -1,8 +1,6 @@
 const FIREFOX_DEFAULT_COOKIE_STORE = "firefox-default";
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
 
-var cloaked_tabs = [];
-
 function onCreated() {
   if (browser.runtime.lastError) {
     console.log(`Error: ${browser.runtime.lastError}`);
@@ -28,7 +26,7 @@ async function restoreCloak(tab) {
       });
     `
   });
-  window.cloaked_tabs = window.cloaked_tabs.filter(item => ![tab.id].includes(item));
+  browser.sessions.setTabValue(tab.id, 'cloaked', false);
   console.log("Tab "+tab.id+" is now restored");
 }
 
@@ -68,7 +66,7 @@ async function actuallyCloak(tab) {
       });
     `});
 
-  window.cloaked_tabs.push(tab.id);
+  await browser.sessions.setTabValue(tab.id, "cloaked", true);
   console.log("tab "+tab.id+" is now cloaked");
 }
 
@@ -83,7 +81,10 @@ async function cloak(tab) {
   let tabs = await browser.tabs.query({cookieStoreId: tab.cookieStoreId});
   for (let ctab of tabs) {
     if (tab.cookieStoreId == ctab.cookieStoreId) {
-      if (window.cloaked_tabs.includes(ctab.id)) {
+      console.log('stuff');
+      let state = await browser.sessions.getTabValue(ctab.id, "cloaked");
+      console.log(state);
+      if (state) {
         console.log("Will restore cloak tab: "+ctab.id);
         restoreCloak(ctab);
       } else {
