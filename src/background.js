@@ -27,6 +27,7 @@ async function restoreCloak(tab) {
     `
   });
   browser.sessions.setTabValue(tab.id, 'cloaked', false);
+  browser.tabs.update(tab.id, {muted: false});
   console.log("Tab "+tab.id+" is now restored");
 }
 
@@ -67,6 +68,7 @@ async function actuallyCloak(tab) {
     `});
 
   await browser.sessions.setTabValue(tab.id, "cloaked", true);
+  browser.tabs.update(tab.id, {muted: true});
   console.log("tab "+tab.id+" is now cloaked");
 }
 
