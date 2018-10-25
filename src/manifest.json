@@ -38,6 +38,8 @@
         "menus",
         "activeTab",
         "sessions",
+        "webRequest",
+        "webRequestBlocking",
         "<all_urls>"
     ],
 

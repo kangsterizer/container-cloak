@@ -102,10 +102,26 @@ function initializePageAction(tab) {
   }
 }
 
+async function initializeCloak(tab) {
+  let state = await browser.sessions.getTabValue(details.tabId, "cloaked");
+  if (state) {
+    actuallyCloak(tab.id);
+  }
+}
+
 function protocolIsApplicable(url) {
   var anchor =  document.createElement('a');
   anchor.href = url;
   return APPLICABLE_PROTOCOLS.includes(anchor.protocol);
+}
+
+async function beforeRequest(details) {
+  let state = await browser.sessions.getTabValue(details.tabId, "cloaked");
+  if (state) {
+    console.log("this is a hidden tab, reloading is forbidden");
+    return {cancel: true};
+  }
+  return {cancel: false};
 }
 
 // Apply page action to all tabs on startup
@@ -113,11 +129,12 @@ var gettingAllTabs = browser.tabs.query({});
 gettingAllTabs.then((tabs) => {
   for (let tab of tabs) {
     initializePageAction(tab);
+    initializeCloak(tab);
   }
 });
 
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
   initializePageAction(tab);
 });
-
+browser.webRequest.onBeforeRequest.addListener(beforeRequest, {urls: ["<all_urls>"], types: ["main_frame"]}, ["blocking"]);
 browser.pageAction.onClicked.addListener(cloak);
