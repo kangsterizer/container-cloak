@@ -37,6 +37,7 @@
         "tabs",
         "menus",
         "activeTab",
+        "sessions",
         "<all_urls>"
     ],
 
