@@ -24,7 +24,7 @@ async function restoreCloak(tab) {
   chrome.tabs.executeScript(tab.id, {
     code: `
       Array.prototype.slice.call(document.querySelectorAll("link[rel~=icon]")).forEach(function(l){
-      l.href = l.saved_href;
+        l.href = l.saved_href;
       });
     `
   });
@@ -49,7 +49,7 @@ async function actuallyCloak(tab) {
   document.title = "Cloaked <`+getContext.name+`>";
   `;
 
-  browser.tabs.executeScript(tab.id, {
+  await browser.tabs.executeScript(tab.id, {
     code: blackPageOut
   });
 
@@ -58,11 +58,16 @@ async function actuallyCloak(tab) {
 
   chrome.tabs.executeScript(tab.id, {
     code: `
+      // If no favicon exist, add one. I don't actually know why it's necessary, some Firefox shenanigans
+      if (!document.querySelector("link[rel~=icon]")) {
+        document.head.insertAdjacentHTML('beforeend', '<link rel="icon" href="`+tab.favIconURL+`">');
+      }
       Array.prototype.slice.call(document.querySelectorAll("link[rel~=icon]")).forEach(function(l){
-      l.saved_href = l.href;
-      l.href = "`+faviconURL+`";
+        l.saved_href = l.href;
+        l.href = "`+faviconURL+`";
       });
     `});
+  console.log(tab);
 
   window.cloaked_tabs.push(tab.id);
   console.log("tab "+tab.id+" is now cloaked");
