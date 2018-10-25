@@ -1,0 +1,46 @@
+{
+    "manifest_version": 2,
+    "name": "Container Cloak",
+    "version": "1.0.0",
+
+    "description": "Something here",
+
+    "icons": {
+        "48": "48-favicon.png",
+        "72": "72-favicon.png",
+        "96": "96-favicon.png"
+    },
+
+    "web_accessible_resources": [
+        "48-favicon.png",
+        "72-favicon.png",
+        "96-favicon.png"
+    ],
+
+    "page_action": {
+      "default_icon": "48-favicon.png",
+      "browser_style": true
+    },
+
+    "applications": {
+      "gecko": {
+        "id": "@container-cloak",
+        "strict_min_version": "57.0"
+      }
+    },
+
+    "homepage_url": "https://github.com/mozilla-iam/container-cloak",
+
+    "permissions": [
+        "contextualIdentities",
+        "cookies",
+        "tabs",
+        "menus",
+        "activeTab",
+        "<all_urls>"
+    ],
+
+    "background": {
+        "scripts": ["background.js"]
+    }
+}
