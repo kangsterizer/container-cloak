@@ -1,5 +1,6 @@
 const FIREFOX_DEFAULT_COOKIE_STORE = "firefox-default";
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
+var CURRENTLY_CLOAKED = []; // runtime state (vs session saved state)
 
 function onCreated() {
   if (browser.runtime.lastError) {
@@ -26,15 +27,22 @@ async function restoreCloak(tab) {
       });
     `
   });
-  browser.sessions.setTabValue(tab.id, 'cloaked', false);
-  browser.tabs.update(tab.id, {muted: false});
+  await browser.tabs.update(tab.id, {muted: false});
+  await browser.sessions.setTabValue(tab.id, 'cloaked', false);
+  CURRENTLY_CLOAKED = CURRENTLY_CLOAKED.filter(item => item !== tab.id);
   console.log("Tab "+tab.id+" is now restored");
 }
 
 async function actuallyCloak(tab) {
-  //Change tab title
-  //blackout page contents
-  var getContext = await browser.contextualIdentities.get(tab.cookieStoreId);
+  if (CURRENTLY_CLOAKED.includes(tab.id)) {
+    //no need to do anything here
+    return;
+  }
+  try {
+    var getContext = await browser.contextualIdentities.get(tab.cookieStoreId);
+  } catch {
+    var getContext = {name: 'default'}
+  }
   var blackPageOut = `
   // Save things to restore them later
   var saved_to_uncloak = document.body.style;
@@ -67,8 +75,9 @@ async function actuallyCloak(tab) {
       });
     `});
 
+  await browser.tabs.update(tab.id, {muted: true});
   await browser.sessions.setTabValue(tab.id, "cloaked", true);
-  browser.tabs.update(tab.id, {muted: true});
+  CURRENTLY_CLOAKED.push(tab.id);
   console.log("tab "+tab.id+" is now cloaked");
 }
 
@@ -97,7 +106,7 @@ function initializePageAction(tab) {
 }
 
 async function initializeCloak(tab) {
-  let state = await browser.sessions.getTabValue(details.tabId, "cloaked");
+  let state = await browser.sessions.getTabValue(tab.id, "cloaked");
   if (state) {
     actuallyCloak(tab.id);
   }
