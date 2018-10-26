@@ -1,3 +1,5 @@
+all:
+	web-ext build -s src/ --overwrite-dest
 zip:
 	cd src && zip -r -FS ../container-cloak.zip *
 

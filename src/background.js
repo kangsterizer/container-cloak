@@ -73,12 +73,6 @@ async function actuallyCloak(tab) {
 }
 
 async function cloak(tab) {
-  // go through all containers for this jar and cloak em
-  if (tab.cookieStoreId == FIREFOX_DEFAULT_COOKIE_STORE) {
-    console.log("Won't cloak default cookie store!");
-    return;
-  }
-
   // Go through all tabs and find the ones with our cookie store/container so we cloak all of them
   let tabs = await browser.tabs.query({cookieStoreId: tab.cookieStoreId});
   for (let ctab of tabs) {
